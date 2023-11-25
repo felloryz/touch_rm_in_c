@@ -2,19 +2,20 @@
 #include <string.h>
 
 typedef enum {
-    E_ACTION_ERROR = -1,
+    E_ERROR = -1,
     E_HELP,
     E_CREATE,
     E_DELETE
 } e_actions;
 
 void print_help(char *program_name);
+int arg_parse(int argc, char *argv[]);
 void create_files(int number_of_files, char *file_names[]);
 void delete_files(int number_of_files, char *file_names[]);
 
 int main(int argc, char *argv[]) 
 {
-    // separate whole parse slgorithm into a function
+    // separate whole parse algorithm into a function
     if (argc < 2)
     {
         printf("Missing file operand\n");
@@ -76,6 +77,42 @@ void print_help(char *program_name)
             "-c/--create        create file\n"
             "-d/--delete        delete file\n"
             "-h/--help          print help message\n", program_name);
+}
+
+int arg_parse(int argc, char *argv[])
+{
+    if (argc < 2)
+        return E_ERROR;
+    
+    if (argv[1][0] != '-')
+        return E_ERROR;
+    
+    if (strlen(argv[1]) == 2)
+    {
+        if (argv[1][1] == 'h')
+            return E_HELP;
+        else if (argv[1][1] == 'c')
+            return E_CREATE;
+        else if (argv[1][1] == 'd')
+            return E_DELETE;
+        else
+            return E_ERROR;
+    }
+
+    if (argv[1][1] != '-')
+        return E_ERROR;
+    
+    if (strlen(argv[1]) > 2)
+    {
+        if (!(strcmp(&argv[1][2], "help")))
+            return E_HELP;
+        else if (!(strcmp(&argv[1][2], "create")))
+            return E_CREATE;
+        else if (!(strcmp(&argv[1][2], "delete")))
+            return E_DELETE;
+        else
+            return E_ERROR;
+    }
 }
 
 void create_files(int number_of_files, char *file_names[])
