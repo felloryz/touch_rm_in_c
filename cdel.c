@@ -10,29 +10,36 @@ typedef enum {
 
 void print_help(char *program_name);
 int arg_parse(int argc, char *argv[]);
-void create_files(int number_of_files, char *file_names[]);
-void delete_files(int number_of_files, char *file_names[]);
+int create_file(char *filename);
 
 int main(int argc, char *argv[]) 
 {
     e_actions action = arg_parse(argc, argv);
 
-    switch (action)
+    if (action == E_ERROR)
     {
-        case E_ERROR:
-            printf("Invalid option '%s'\n", argv[1]);
-            break;
-        case E_HELP:
-            print_help(argv[0]);
-            break;
-        case E_CREATE:
-            create_files(argc-2, &argv[2]);
-            break;
-        case E_DELETE:
-            delete_files(argc-2, &argv[2]);
-            break;
-        default:
-            break;
+        printf("Invalid option '%s'\n", argv[1]);
+        return -1;
+    }
+    
+    if (action == E_HELP)
+    {
+        print_help(argv[0]);
+        return 0;
+    }
+
+    for (int i = 2; i < argc; i++)
+    {
+        if (action == E_CREATE)
+        {
+            if (create_file(argv[i]) != 0)
+                printf("'%s': No such file or directory\n", argv[i]);
+        }
+        else if (action == E_DELETE)
+        {
+            if (remove(argv[i]) != 0)
+                printf("'%s': No such file or directory\n", argv[i]);
+        }
     }
 
     return 0;
@@ -84,27 +91,16 @@ int arg_parse(int argc, char *argv[])
     return E_ERROR;
 }
 
-void create_files(int number_of_files, char *file_names[])
+int create_file(char *filename)
 {
-    for (int i = 0; i < number_of_files; i++)
-    {
-        FILE *fptr;
-        fptr = fopen(file_names[i], "w");
+    FILE *fptr;
+    fptr = fopen(filename, "w");
 
-        if (fptr != NULL)
-            fclose(fptr);
-        else
-            printf("'%s': No such file or directory\n", file_names[i]);
-    }
-}
-
-void delete_files(int number_of_files, char *file_names[])
-{
-    for (int i = 0; i < number_of_files; i++)
+    if (fptr != NULL)
     {
-        if (remove(file_names[i]) != 0)
-        {
-            printf("'%s': No such file or directory\n", file_names[i]);
-        }
+        fclose(fptr);
+        return 0;
     }
+    else
+        return -1;
 }
