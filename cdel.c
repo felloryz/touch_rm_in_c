@@ -15,7 +15,7 @@ void delete_files(int number_of_files, char *file_names[]);
 
 int main(int argc, char *argv[]) 
 {
-    int action = arg_parse(argc, argv);
+    e_actions action = arg_parse(argc, argv);
 
     switch (action)
     {
@@ -49,7 +49,7 @@ void print_help(char *program_name)
 int arg_parse(int argc, char *argv[])
 {
     if (argc < 2)
-        return E_ERROR;
+        return E_HELP;
     
     if (argv[1][0] != '-')
         return E_ERROR;
